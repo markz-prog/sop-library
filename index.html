@@ -884,6 +884,34 @@ const sops = [
     ] },
   { id:'SOP-012', dept:'tt', title:'Communication Standards', cat:'communication', type:'list',
     items:['Good update','Bad update','Required information','ETA format','Time zones','Professional wording','Email format','Telegram format'] },
+
+  { id:'QA-001', dept:'qa', title:'Daily QA Tasks', cat:'daily-ops', heading:'Daily', type:'list',
+    items:[
+      'Collecting and uploading driver details to TMS',
+      'Assessing submitted CDL \u2014 non-CDL is not accepted; checking whether the CDL is expired',
+      'Assigning drivers to Indemni and FourKites',
+      'Conducting check calls with the driver, preferably the day before the shipment \u2014 confirms the driver understands the rules and policy inside the USPS facility; verifying both drivers on the call is a must',
+      'Helping Track & Trace monitor whether drivers are tracking on FourKites',
+      'Posting any at-risk ETAs in the QA Telegram tab',
+      'Confirming driver safety gear, English proficiency, and current location',
+      'Flagging non-English speakers and missed check calls (driver not answering)',
+      'Flagging new pending carriers in TMS for QA manager approval',
+      'Sending memos to drivers on which lane they\u2019re assigned to',
+    ] },
+  { id:'QA-002', dept:'qa', title:'Weekly QA Tasks', cat:'reporting', heading:'Weekly', type:'list',
+    items:[
+      'Uploading EDIs to TMS for load planning and MATRIX',
+      'Sending dedicated rate confirmations to carriers on or before Friday for next week\u2019s loads',
+    ] },
+
+  { id:'SALES-001', dept:'sales', title:'Sales Support Tasks', cat:'daily-ops', type:'list',
+    items:[
+      'Sending rate confirmations',
+      'Building loads in LoadStop',
+      'Getting driver info',
+      'Assisting carriers with inquiries',
+      'Handing off to QA',
+    ] },
 ];
 
 const teams = [
@@ -1503,6 +1531,34 @@ function renderTree(){
 const refGrid = document.getElementById('refGrid');
 function buildReference(){
   if(!deptScope){ refGrid.innerHTML = ''; return; }
+
+  if(deptScope.key === 'qa'){
+    const daily = sops.find(s=> s.id==='QA-001');
+    const weekly = sops.find(s=> s.id==='QA-002');
+    refGrid.innerHTML = `
+      <div class="ref-card glass">
+        <div class="ref-card-head"><div class="ref-icon" style="--ref-color:var(--violet)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></div><h4>Daily QA Checklist</h4></div>
+        <div class="ref-check-list">${daily.items.map((i,idx)=> `<div class="ref-check-item" data-check="qadaily-${idx}"><span class="ref-check-box">${CHECK_SVG}</span><span class="txt">${i}</span></div>`).join('')}</div>
+      </div>
+      <div class="ref-card glass">
+        <div class="ref-card-head"><div class="ref-icon" style="--ref-color:var(--slate)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><h4>Weekly QA Checklist</h4></div>
+        <div class="ref-check-list">${weekly.items.map((i,idx)=> `<div class="ref-check-item" data-check="qaweekly-${idx}"><span class="ref-check-box">${CHECK_SVG}</span><span class="txt">${i}</span></div>`).join('')}</div>
+      </div>`;
+    refGrid.querySelectorAll('.ref-check-item').forEach(item=> item.addEventListener('click', ()=> item.classList.toggle('checked')));
+    return;
+  }
+
+  if(deptScope.key === 'sales'){
+    const daily = sops.find(s=> s.id==='SALES-001');
+    refGrid.innerHTML = `
+      <div class="ref-card glass">
+        <div class="ref-card-head"><div class="ref-icon" style="--ref-color:var(--teal)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h4>Sales Support Checklist</h4></div>
+        <div class="ref-check-list">${daily.items.map((i,idx)=> `<div class="ref-check-item" data-check="sales-${idx}"><span class="ref-check-box">${CHECK_SVG}</span><span class="txt">${i}</span></div>`).join('')}</div>
+      </div>`;
+    refGrid.querySelectorAll('.ref-check-item').forEach(item=> item.addEventListener('click', ()=> item.classList.toggle('checked')));
+    return;
+  }
+
   if(deptScope.key !== 'tt'){
     refGrid.innerHTML = emptyDeptCard(
       `No quick reference sheets yet for ${deptScope.label}`,
